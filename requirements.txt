@@ -7,3 +7,4 @@ tensorflow
 httplib2==0.15.0
 google-api-python-client==1.6
 pydrive
+nbconvert

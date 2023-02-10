@@ -10,8 +10,9 @@ class Drive:
 
     def upload_files_from_folder(self, folder_path, folder_id):
         file_list = os.listdir(folder_path)
-        for file_name in file_list:
-            file1 = self.drive.CreateFile({'parents': [{'id': folder_id}]})
+        h5_files = [os.path.join(folder_path, file_name) for file_name in file_list if file_name.endswith('.h5')]
+        for file_name in h5_files:
+            file1 = self.drive.CreateFile({'parents': [{'id': folder_id}], 'title': file_name})
             file1.SetContentFile(file_name)
             file1.Upload()
 
