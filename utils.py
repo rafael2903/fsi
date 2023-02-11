@@ -36,6 +36,18 @@ class Drive:
     def upload_models(self):
         self.upload_files_from_folder('saved_models', '1xNq5nAD8PshJSQM5kp4Z-j9z81W1MGmD')
 
+    def upload_file(self, file_path, folder_id='1xNq5nAD8PshJSQM5kp4Z-j9z81W1MGmD'):
+        filename = os.path.basename(file_path)
+        file1 = self.drive.CreateFile({'parents': [{'id': folder_id}], 'title': filename})
+        file1.SetContentFile(file_path)
+        file1.Upload()
+
+    def download_file(self, filename, folder_id='1xNq5nAD8PshJSQM5kp4Z-j9z81W1MGmD'):
+        file_list = self.drive.ListFile({'q': "'{}' in parents and trashed=false".format(folder_id)}).GetList()
+        for f in file_list:
+            if f['title'] == filename:
+                f_ = self.drive.CreateFile({'id': f['id']})
+                f_.GetContentFile(filename)
 
 def unzip_dataset():
     import zipfile

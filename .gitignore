@@ -2,3 +2,6 @@
 /dataset
 __pycache__/
 model.py
+*.jpg
+*.zip
+.DS_Store
