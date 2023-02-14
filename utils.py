@@ -3,7 +3,7 @@ from pydrive.drive import GoogleDrive
 import os
 
 base_models = {
-    "EfficientNetB0": '14mt3mTd-gxxwMQfBFYQYEcYWlBFMqost',
+    "EfficientNetB0": '1n1kSDIaw0HYC1CpymtGl256bYYud25JZ',
     "ResNet50": '1_qJ92TpxmbJWZsS-Q9zhMrY23VTQAWN1',
     "DenseNet201": '14XVwLFDaC-YattM2Q0XvCS3Plz-BdKGm',
 }
@@ -16,10 +16,14 @@ class Drive:
 
     def upload_files_from_folder(self, folder_path, folder_id):
         file_list = os.listdir(folder_path)
-        h5_files = [os.path.join(folder_path, file_name) for file_name in file_list if file_name.endswith('.h5')]
-        for file_name in h5_files:
-            file1 = self.drive.CreateFile({'parents': [{'id': folder_id}], 'title': file_name})
-            file1.SetContentFile(file_name)
+        h5_files = [(file_name, os.path.join(folder_path, file_name)) for file_name in file_list if file_name.endswith('.h5')]
+        for file_name, file_dir in h5_files:
+            file_id = self.drive.ListFile({'q': "title='{}' and '{}' in parents and trashed=false".format(file_name, folder_id)}).GetList()
+            file = {'parents': [{'id': folder_id}], 'title': file_name}
+            if len(file_id) > 0:
+                file['id'] = file_id[0]['id']
+            file1 = self.drive.CreateFile(file)
+            file1.SetContentFile(file_dir)
             file1.Upload()
 
     def download_folder_files(self, folder_id, dest_path):
@@ -45,7 +49,11 @@ class Drive:
     def upload_file(self, file_path, base_model_name):
         folder_id = base_models[base_model_name]
         filename = os.path.basename(file_path)
-        file1 = self.drive.CreateFile({'parents': [{'id': folder_id}], 'title': filename})
+        file_id = self.drive.ListFile({'q': "title='{}' and '{}' in parents and trashed=false".format(filename, folder_id)}).GetList()
+        file = {'parents': [{'id': folder_id}], 'title': filename}
+        if len(file_id) > 0:
+            file['id'] = file_id[0]['id']
+        file1 = self.drive.CreateFile(file)
         file1.SetContentFile(file_path)
         file1.Upload()
 
